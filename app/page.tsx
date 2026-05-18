@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Portfolio() {
   const [mouseX, setMouseX] = useState(50);
   const [activeCategory, setActiveCategory] = useState("Aucun");
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const socialLinks = {
     twitter: "https://x.com/JLRazooor",
@@ -86,17 +86,45 @@ export default function Portfolio() {
       ? []
       : projects.filter((project) => project.category === activeCategory);
 
+  const selectedProject =
+    selectedIndex !== null ? filteredProjects[selectedIndex] : null;
+
   function handleNameMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     setMouseX(x);
   }
 
+  function previousImage() {
+    if (selectedIndex === null) return;
+    setSelectedIndex(
+      selectedIndex === 0 ? filteredProjects.length - 1 : selectedIndex - 1
+    );
+  }
+
+  function nextImage() {
+    if (selectedIndex === null) return;
+    setSelectedIndex(
+      selectedIndex === filteredProjects.length - 1 ? 0 : selectedIndex + 1
+    );
+  }
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setSelectedIndex(null);
+      if (e.key === "ArrowLeft") previousImage();
+      if (e.key === "ArrowRight") nextImage();
+    }
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  });
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#050505] text-white">
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_18%,rgba(239,68,68,0.22),transparent_32%)]" />
 
-      <header className="fixed top-0 left-0 right-0 z-[9999] border-b border-white/10 bg-black/70 backdrop-blur-xl">
+      <header className="fixed left-0 right-0 top-0 z-[9999] border-b border-white/10 bg-black/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <a href="#home" className="text-2xl font-black">
             jlrazor<span className="text-red-500">.</span>
@@ -110,7 +138,11 @@ export default function Portfolio() {
             <span
               className="bg-clip-text text-xl font-black tracking-[0.4em] text-transparent"
               style={{
-                backgroundImage: `linear-gradient(90deg, white 0%, white ${mouseX - 14}%, #ef4444 ${mouseX}%, white ${mouseX + 14}%, white 100%)`,
+                backgroundImage: `linear-gradient(90deg, white 0%, white ${
+                  mouseX - 14
+                }%, #ef4444 ${mouseX}%, white ${
+                  mouseX + 14
+                }%, white 100%)`,
               }}
             >
               razooor
@@ -118,10 +150,10 @@ export default function Portfolio() {
           </div>
 
           <nav className="hidden gap-8 text-xs uppercase tracking-widest text-white/60 md:flex">
-            <a href="#services">Services</a>
-            <a href="#work">Projets</a>
-            <a href="#about">À propos</a>
-            <a href="#contact">Contact</a>
+            <a href="#services" className="hover:text-red-500">Services</a>
+            <a href="#work" className="hover:text-red-500">Projets</a>
+            <a href="#about" className="hover:text-red-500">À propos</a>
+            <a href="#contact" className="hover:text-red-500">Contact</a>
           </nav>
         </div>
       </header>
@@ -169,7 +201,6 @@ export default function Portfolio() {
           <p className="mb-4 text-xs font-bold uppercase tracking-[0.35em] text-red-500">
             Services
           </p>
-
           <h2 className="text-4xl font-black md:text-5xl">
             Des créations adaptées à chaque univers.
           </h2>
@@ -177,7 +208,10 @@ export default function Portfolio() {
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {services.map(([title, desc]) => (
-            <div key={title} className="rounded-3xl border border-white/10 bg-white/[0.03] p-8">
+            <div
+              key={title}
+              className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 transition duration-300 hover:-translate-y-2 hover:border-red-500/50"
+            >
               <h3 className="text-xl font-black">{title}</h3>
               <p className="mt-4 text-sm leading-7 text-white/55">{desc}</p>
             </div>
@@ -199,7 +233,10 @@ export default function Portfolio() {
             {categories.map((category) => (
               <button
                 key={category}
-                onClick={() => setActiveCategory(category)}
+                onClick={() => {
+                  setActiveCategory(category);
+                  setSelectedIndex(null);
+                }}
                 className={`rounded-full border px-5 py-3 text-xs font-bold uppercase tracking-widest transition ${
                   activeCategory === category
                     ? "border-red-500 bg-red-600 text-white"
@@ -218,22 +255,20 @@ export default function Portfolio() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-              {filteredProjects.map((project) => (
-                <div
+            <div className="columns-1 gap-8 md:columns-2 xl:columns-3">
+              {filteredProjects.map((project, index) => (
+                <button
                   key={project.title + project.image}
-                  className="group overflow-hidden rounded-3xl border border-white/10 bg-[#080808] transition hover:-translate-y-2 hover:border-red-500/70"
+                  onClick={() => setSelectedIndex(index)}
+                  className="group mb-8 block w-full break-inside-avoid overflow-hidden rounded-3xl border border-white/10 bg-[#080808] text-left transition duration-300 hover:-translate-y-2 hover:border-red-500/70 hover:shadow-[0_0_35px_rgba(239,68,68,0.18)]"
                 >
-                  <div
-                    onClick={() => setSelectedImage(project.image)}
-                    className="relative h-[420px] cursor-pointer overflow-hidden bg-black"
-                  >
+                  <div className="overflow-hidden bg-black">
                     <Image
                       src={project.image}
                       alt={project.title}
                       width={1200}
                       height={900}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      className="h-auto w-full transition duration-500 group-hover:scale-105"
                     />
                   </div>
 
@@ -243,7 +278,7 @@ export default function Portfolio() {
                       {project.type}
                     </p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}
@@ -307,30 +342,57 @@ export default function Portfolio() {
         © 2026 jlrazor — Direction artistique & design graphique
       </footer>
 
-      {selectedImage && (
+      {selectedProject && selectedIndex !== null && (
         <div
-          onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 p-6"
+          onClick={() => setSelectedIndex(null)}
+          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 p-6"
         >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              previousImage();
+            }}
+            className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-3xl font-black transition hover:bg-red-600"
+          >
+            ‹
+          </button>
+
           <div
             onClick={(e) => e.stopPropagation()}
             className="relative max-h-[95vh] max-w-[95vw]"
           >
             <Image
-              src={selectedImage}
-              alt="Aperçu"
-              width={2000}
-              height={2000}
-              className="max-h-[95vh] w-auto rounded-2xl object-contain"
+              src={selectedProject.image}
+              alt={selectedProject.title}
+              width={2400}
+              height={2400}
+              className="max-h-[88vh] w-auto rounded-2xl object-contain"
             />
 
+            <div className="mt-4 text-center">
+              <h3 className="text-2xl font-black">{selectedProject.title}</h3>
+              <p className="mt-1 text-sm uppercase tracking-widest text-red-500">
+                {selectedProject.type}
+              </p>
+            </div>
+
             <button
-              onClick={() => setSelectedImage(null)}
+              onClick={() => setSelectedIndex(null)}
               className="absolute -right-3 -top-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-600 text-xl font-black text-white"
             >
               ×
             </button>
           </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              nextImage();
+            }}
+            className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-3xl font-black transition hover:bg-red-600"
+          >
+            ›
+          </button>
         </div>
       )}
     </main>
