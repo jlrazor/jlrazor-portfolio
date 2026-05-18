@@ -6,6 +6,7 @@ import { useState } from "react";
 export default function Portfolio() {
   const [mouseX, setMouseX] = useState(50);
   const [activeCategory, setActiveCategory] = useState("Aucun");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const socialLinks = {
     twitter: "https://x.com/JLRazooor",
@@ -223,13 +224,16 @@ export default function Portfolio() {
                   key={project.title + project.image}
                   className="group overflow-hidden rounded-3xl border border-white/10 bg-[#080808] transition hover:-translate-y-2 hover:border-red-500/70"
                 >
-                  <div className="flex h-[420px] items-center justify-center bg-black p-4">
+                  <div
+                    onClick={() => setSelectedImage(project.image)}
+                    className="relative h-[420px] cursor-pointer overflow-hidden bg-black"
+                  >
                     <Image
                       src={project.image}
                       alt={project.title}
                       width={1200}
                       height={900}
-                      className="max-h-full w-full object-contain transition duration-500 group-hover:scale-105"
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                   </div>
 
@@ -302,6 +306,33 @@ export default function Portfolio() {
       <footer className="border-t border-white/10 px-6 py-8 text-center text-sm text-white/35">
         © 2026 jlrazor — Direction artistique & design graphique
       </footer>
+
+      {selectedImage && (
+        <div
+          onClick={() => setSelectedImage(null)}
+          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 p-6"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[95vh] max-w-[95vw]"
+          >
+            <Image
+              src={selectedImage}
+              alt="Aperçu"
+              width={2000}
+              height={2000}
+              className="max-h-[95vh] w-auto rounded-2xl object-contain"
+            />
+
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute -right-3 -top-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-600 text-xl font-black text-white"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
