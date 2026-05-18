@@ -427,81 +427,84 @@ export default function Portfolio() {
           </div>
         </div>
       </section>
+<audio ref={audioRef} loop>
+  <source src="/music.mp3" type="audio/mpeg" />
+</audio>
 
-      <footer className="border-t border-white/10 px-6 py-8 text-center text-sm text-white/35">
-        © 2026 jlrazor — Direction artistique & design graphique
-      </footer>
+<div className="fixed bottom-5 right-5 z-[9999] w-[310px] rounded-3xl border border-white/10 bg-black/80 p-4 shadow-[0_0_40px_rgba(239,68,68,0.25)] backdrop-blur-xl">
+  <div className="flex items-center gap-4">
+    <Image
+      src="/music-cover.png"
+      alt="FULL Bunny x Snow"
+      width={64}
+      height={64}
+      className="h-16 w-16 rounded-2xl object-cover"
+    />
 
-      <div className="fixed bottom-5 right-5 z-[9999] w-[310px] rounded-3xl border border-white/10 bg-black/80 p-4 shadow-[0_0_40px_rgba(239,68,68,0.25)] backdrop-blur-xl">
-        <div className="flex items-center gap-4">
-          <Image
-            src="/music-cover.png"
-            alt="FULL Bunny x Snow"
-            width={64}
-            height={64}
-            className="h-16 w-16 rounded-2xl object-cover"
-          />
+    <div className="min-w-0 flex-1">
+      <p className="truncate text-sm font-black">
+        FULL Bunny x Snow
+      </p>
 
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-black">FULL Bunny x Snow</p>
-            <p className="mt-1 text-xs uppercase tracking-widest text-red-500">
-              Background music
-            </p>
-          </div>
-        </div>
+      <p className="mt-1 text-xs uppercase tracking-widest text-red-500">
+        Background music
+      </p>
+    </div>
+  </div>
 
-        <div className="mt-4 flex items-center gap-3">
-          <button
-            onClick={() => {
-              if (!audioRef.current) return;
+  <div className="mt-4 flex items-center gap-3">
+    <button
+      onClick={() => {
+        if (!audioRef.current) return;
 
-              if (isPlaying) {
-                audioRef.current.pause();
-                setIsPlaying(false);
-              } else {
-                audioRef.current.volume = volume / 100;
-                audioRef.current.play();
-                setIsPlaying(true);
-              }
-            }}
-            className="rounded-xl bg-red-600 px-4 py-3 text-xs font-black uppercase tracking-widest transition hover:bg-red-500"
-          >
-            {isPlaying ? "Pause" : "Play"}
-          </button>
+        if (isPlaying) {
+          audioRef.current.pause();
+          setIsPlaying(false);
+        } else {
+          audioRef.current.volume = volume / 100;
+          audioRef.current.play();
+          setIsPlaying(true);
+        }
+      }}
+      className="rounded-xl bg-red-600 px-4 py-3 text-xs font-black uppercase tracking-widest transition hover:bg-red-500"
+    >
+      {isPlaying ? "Pause" : "Play"}
+    </button>
 
-          <a
-            href="https://www.youtube.com/watch?v=6jrbItiOotc"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-xl border border-white/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-white/70 transition hover:border-red-500 hover:text-white"
-          >
-            Lien
-          </a>
-        </div>
+    <a
+      href="https://www.youtube.com/watch?v=6jrbItiOotc"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="rounded-xl border border-white/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-white/70 transition hover:border-red-500 hover:text-white"
+    >
+      Lien
+    </a>
+  </div>
 
-        <div className="mt-4">
-          <div className="mb-2 flex justify-between text-xs text-white/50">
-            <span>Volume</span>
-            <span>{volume}%</span>
-          </div>
+  <div className="mt-4">
+    <div className="mb-2 flex justify-between text-xs text-white/50">
+      <span>Volume</span>
+      <span>{volume}%</span>
+    </div>
 
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={volume}
-            onChange={(e) => {
-              const newVolume = Number(e.target.value);
-              setVolume(newVolume);
+    <input
+      type="range"
+      min="0"
+      max="100"
+      value={volume}
+      onChange={(e) => {
+        const newVolume = Number(e.target.value);
 
-              if (audioRef.current) {
-                audioRef.current.volume = newVolume / 100;
-              }
-            }}
-            className="w-full accent-red-600"
-          />
-        </div>
-      </div>
+        setVolume(newVolume);
+
+        if (audioRef.current) {
+          audioRef.current.volume = newVolume / 100;
+        }
+      }}
+      className="w-full accent-red-600"
+    />
+  </div>
+</div>
 
       {selectedProject && selectedIndex !== null && (
         <div
