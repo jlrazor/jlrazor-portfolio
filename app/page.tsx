@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Portfolio() {
   const [mouseX, setMouseX] = useState(50);
@@ -10,6 +10,10 @@ export default function Portfolio() {
   const [isLoading, setIsLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(25);
 
   const socialLinks = {
     twitter: "https://x.com/JLRazooor",
@@ -82,14 +86,7 @@ export default function Portfolio() {
     { title: "Mon Del'", type: "Cover", category: "Covers", image: "/Cover_Mon_Del_Snow.png" },
   ];
 
-  const featuredProjects = [
-    projects[3],
-    projects[5],
-    projects[13],
-    projects[31],
-    projects[36],
-  ];
-
+  const featuredProjects = [projects[3], projects[5], projects[13], projects[31], projects[36]];
   const categories = ["Aucun", "Logos", "Affiches", "3D", "Covers"];
 
   const filteredProjects =
@@ -108,16 +105,12 @@ export default function Portfolio() {
 
   function previousImage() {
     if (selectedIndex === null || filteredProjects.length === 0) return;
-    setSelectedIndex(
-      selectedIndex === 0 ? filteredProjects.length - 1 : selectedIndex - 1
-    );
+    setSelectedIndex(selectedIndex === 0 ? filteredProjects.length - 1 : selectedIndex - 1);
   }
 
   function nextImage() {
     if (selectedIndex === null || filteredProjects.length === 0) return;
-    setSelectedIndex(
-      selectedIndex === filteredProjects.length - 1 ? 0 : selectedIndex + 1
-    );
+    setSelectedIndex(selectedIndex === filteredProjects.length - 1 ? 0 : selectedIndex + 1);
   }
 
   useEffect(() => {
@@ -171,6 +164,10 @@ export default function Portfolio() {
         </div>
       )}
 
+      <audio ref={audioRef} loop>
+        <source src="/music.wav" type="audio/wav" />
+      </audio>
+
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_18%,rgba(239,68,68,0.22),transparent_32%)]" />
 
       <header
@@ -193,11 +190,7 @@ export default function Portfolio() {
             <span
               className="bg-clip-text text-xl font-black tracking-[0.4em] text-transparent"
               style={{
-                backgroundImage: `linear-gradient(90deg, white 0%, white ${
-                  mouseX - 14
-                }%, #ef4444 ${mouseX}%, white ${
-                  mouseX + 14
-                }%, white 100%)`,
+                backgroundImage: `linear-gradient(90deg, white 0%, white ${mouseX - 14}%, #ef4444 ${mouseX}%, white ${mouseX + 14}%, white 100%)`,
               }}
             >
               razooor
@@ -240,9 +233,7 @@ export default function Portfolio() {
 
             <div className="mt-12 grid max-w-md grid-cols-2 gap-4">
               <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-                <p className="text-4xl font-black text-red-500">
-                  +{projects.length}
-                </p>
+                <p className="text-4xl font-black text-red-500">+{projects.length}</p>
                 <p className="mt-2 text-xs uppercase tracking-widest text-white/50">
                   Projets
                 </p>
@@ -286,9 +277,7 @@ export default function Portfolio() {
                   key={index}
                   onClick={() => setCarouselIndex(index)}
                   className={`h-2 rounded-full transition-all ${
-                    carouselIndex === index
-                      ? "w-8 bg-red-600"
-                      : "w-2 bg-white/20"
+                    carouselIndex === index ? "w-8 bg-red-600" : "w-2 bg-white/20"
                   }`}
                 />
               ))}
@@ -442,6 +431,77 @@ export default function Portfolio() {
       <footer className="border-t border-white/10 px-6 py-8 text-center text-sm text-white/35">
         © 2026 jlrazor — Direction artistique & design graphique
       </footer>
+
+      <div className="fixed bottom-5 right-5 z-[9999] w-[310px] rounded-3xl border border-white/10 bg-black/80 p-4 shadow-[0_0_40px_rgba(239,68,68,0.25)] backdrop-blur-xl">
+        <div className="flex items-center gap-4">
+          <Image
+            src="/music-cover.png"
+            alt="FULL Bunny x Snow"
+            width={64}
+            height={64}
+            className="h-16 w-16 rounded-2xl object-cover"
+          />
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black">FULL Bunny x Snow</p>
+            <p className="mt-1 text-xs uppercase tracking-widest text-red-500">
+              Background music
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <button
+            onClick={() => {
+              if (!audioRef.current) return;
+
+              if (isPlaying) {
+                audioRef.current.pause();
+                setIsPlaying(false);
+              } else {
+                audioRef.current.volume = volume / 100;
+                audioRef.current.play();
+                setIsPlaying(true);
+              }
+            }}
+            className="rounded-xl bg-red-600 px-4 py-3 text-xs font-black uppercase tracking-widest transition hover:bg-red-500"
+          >
+            {isPlaying ? "Pause" : "Play"}
+          </button>
+
+          <a
+            href="https://www.youtube.com/watch?v=6jrbItiOotc"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-xl border border-white/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-white/70 transition hover:border-red-500 hover:text-white"
+          >
+            Lien
+          </a>
+        </div>
+
+        <div className="mt-4">
+          <div className="mb-2 flex justify-between text-xs text-white/50">
+            <span>Volume</span>
+            <span>{volume}%</span>
+          </div>
+
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={volume}
+            onChange={(e) => {
+              const newVolume = Number(e.target.value);
+              setVolume(newVolume);
+
+              if (audioRef.current) {
+                audioRef.current.volume = newVolume / 100;
+              }
+            }}
+            className="w-full accent-red-600"
+          />
+        </div>
+      </div>
 
       {selectedProject && selectedIndex !== null && (
         <div
