@@ -431,134 +431,91 @@ export default function Portfolio() {
   <source src="/music.mp3" type="audio/mpeg" />
 </audio>
 
-<div className="fixed bottom-5 right-5 z-[9999] w-[310px] rounded-3xl border border-white/10 bg-black/80 p-4 shadow-[0_0_40px_rgba(239,68,68,0.25)] backdrop-blur-xl">
-  <div className="flex items-center gap-4">
-    <Image
-      src="/music-cover.png"
-      alt="FULL Bunny x Snow"
-      width={64}
-      height={64}
-      className="h-16 w-16 rounded-2xl object-cover"
-    />
+<div className="fixed bottom-5 right-5 z-[9999] w-[330px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/70 shadow-[0_0_45px_rgba(239,68,68,0.28)] backdrop-blur-2xl">
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(239,68,68,0.28),transparent_35%)]" />
 
-    <div className="min-w-0 flex-1">
-      <p className="truncate text-sm font-black">
-        FULL Bunny x Snow
-      </p>
+  <div className="relative p-4">
+    <div className="flex items-center gap-4">
+      <div className="relative">
+        <Image
+          src="/music-cover.png"
+          alt="FULL Bunny x Snow"
+          width={72}
+          height={72}
+          className={`h-[72px] w-[72px] rounded-2xl object-cover shadow-[0_0_25px_rgba(239,68,68,0.25)] ${
+            isPlaying ? "animate-pulse" : ""
+          }`}
+        />
 
-      <p className="mt-1 text-xs uppercase tracking-widest text-red-500">
-        Background music
-      </p>
+        <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-black bg-red-600" />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-black">
+          FULL Bunny x Snow
+        </p>
+
+        <p className="mt-1 text-[10px] uppercase tracking-[0.25em] text-red-500">
+          {isPlaying ? "Now playing" : "Paused"}
+        </p>
+      </div>
     </div>
-  </div>
 
-  <div className="mt-4 flex items-center gap-3">
-    <button
-      onClick={() => {
-        if (!audioRef.current) return;
+    <div className="mt-5 flex items-center gap-3">
+      <button
+        onClick={() => {
+          if (!audioRef.current) return;
 
-        if (isPlaying) {
-          audioRef.current.pause();
-          setIsPlaying(false);
-        } else {
-          audioRef.current.volume = volume / 100;
-          audioRef.current.play();
-          setIsPlaying(true);
-        }
-      }}
-      className="rounded-xl bg-red-600 px-4 py-3 text-xs font-black uppercase tracking-widest transition hover:bg-red-500"
-    >
-      {isPlaying ? "Pause" : "Play"}
-    </button>
+          if (isPlaying) {
+            audioRef.current.pause();
+            setIsPlaying(false);
+          } else {
+            audioRef.current.volume = volume / 100;
+            audioRef.current.play();
+            setIsPlaying(true);
+          }
+        }}
+        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-600 text-lg font-black transition hover:scale-105 hover:bg-red-500"
+      >
+        {isPlaying ? "Ⅱ" : "▶"}
+      </button>
+
+      <div className="flex-1">
+        <div className="mb-2 flex justify-between text-[10px] uppercase tracking-widest text-white/40">
+          <span>Volume</span>
+          <span>{volume}%</span>
+        </div>
+
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={volume}
+          onChange={(e) => {
+            const newVolume = Number(e.target.value);
+
+            setVolume(newVolume);
+
+            if (audioRef.current) {
+              audioRef.current.volume = newVolume / 100;
+            }
+          }}
+          className="w-full accent-red-600"
+        />
+      </div>
+    </div>
 
     <a
       href="https://www.youtube.com/watch?v=6jrbItiOotc"
       target="_blank"
       rel="noopener noreferrer"
-      className="rounded-xl border border-white/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-white/70 transition hover:border-red-500 hover:text-white"
+      className="mt-4 block rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center text-[10px] font-black uppercase tracking-[0.25em] text-white/60 transition hover:border-red-500 hover:bg-red-600 hover:text-white"
     >
-      Lien
+      Écouter sur YouTube
     </a>
   </div>
-
-  <div className="mt-4">
-    <div className="mb-2 flex justify-between text-xs text-white/50">
-      <span>Volume</span>
-      <span>{volume}%</span>
-    </div>
-
-    <input
-      type="range"
-      min="0"
-      max="100"
-      value={volume}
-      onChange={(e) => {
-        const newVolume = Number(e.target.value);
-
-        setVolume(newVolume);
-
-        if (audioRef.current) {
-          audioRef.current.volume = newVolume / 100;
-        }
-      }}
-      className="w-full accent-red-600"
-    />
-  </div>
 </div>
-
-      {selectedProject && selectedIndex !== null && (
-        <div
-          onClick={() => setSelectedIndex(null)}
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 p-6"
-        >
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              previousImage();
-            }}
-            className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-3xl font-black transition hover:bg-red-600"
-          >
-            ‹
-          </button>
-
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative max-h-[95vh] max-w-[95vw]"
-          >
-            <Image
-              src={selectedProject.image}
-              alt={selectedProject.title}
-              width={2400}
-              height={2400}
-              className="max-h-[88vh] w-auto rounded-2xl object-contain"
-            />
-
-            <div className="mt-4 text-center">
-              <h3 className="text-2xl font-black">{selectedProject.title}</h3>
-              <p className="mt-1 text-sm uppercase tracking-widest text-red-500">
-                {selectedProject.type}
-              </p>
-            </div>
-
-            <button
-              onClick={() => setSelectedIndex(null)}
-              className="absolute -right-3 -top-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-600 text-xl font-black text-white"
-            >
-              ×
-            </button>
-          </div>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              nextImage();
-            }}
-            className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-3xl font-black transition hover:bg-red-600"
-          >
-            ›
-          </button>
-        </div>
-      )}
+ 
     </main>
   );
 }
