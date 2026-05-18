@@ -7,6 +7,9 @@ export default function Portfolio() {
   const [mouseX, setMouseX] = useState(50);
   const [activeCategory, setActiveCategory] = useState("Aucun");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
   const socialLinks = {
     twitter: "https://x.com/JLRazooor",
@@ -79,6 +82,14 @@ export default function Portfolio() {
     { title: "Mon Del'", type: "Cover", category: "Covers", image: "/Cover_Mon_Del_Snow.png" },
   ];
 
+  const featuredProjects = [
+    projects[3],
+    projects[5],
+    projects[13],
+    projects[31],
+    projects[36],
+  ];
+
   const categories = ["Aucun", "Logos", "Affiches", "3D", "Covers"];
 
   const filteredProjects =
@@ -96,18 +107,43 @@ export default function Portfolio() {
   }
 
   function previousImage() {
-    if (selectedIndex === null) return;
+    if (selectedIndex === null || filteredProjects.length === 0) return;
     setSelectedIndex(
       selectedIndex === 0 ? filteredProjects.length - 1 : selectedIndex - 1
     );
   }
 
   function nextImage() {
-    if (selectedIndex === null) return;
+    if (selectedIndex === null || filteredProjects.length === 0) return;
     setSelectedIndex(
       selectedIndex === filteredProjects.length - 1 ? 0 : selectedIndex + 1
     );
   }
+
+  useEffect(() => {
+    const loader = setTimeout(() => setIsLoading(false), 1400);
+
+    function onScroll() {
+      setIsScrolled(window.scrollY > 40);
+    }
+
+    window.addEventListener("scroll", onScroll);
+
+    return () => {
+      clearTimeout(loader);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const carousel = setInterval(() => {
+      setCarouselIndex((prev) =>
+        prev === featuredProjects.length - 1 ? 0 : prev + 1
+      );
+    }, 2800);
+
+    return () => clearInterval(carousel);
+  }, [featuredProjects.length]);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -122,9 +158,28 @@ export default function Portfolio() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#050505] text-white">
+      {isLoading && (
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black">
+          <div className="text-center">
+            <p className="text-5xl font-black tracking-tighter">
+              jlrazor<span className="text-red-500">.</span>
+            </p>
+            <div className="mx-auto mt-6 h-1 w-40 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full w-full animate-pulse bg-red-600" />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_18%,rgba(239,68,68,0.22),transparent_32%)]" />
 
-      <header className="fixed left-0 right-0 top-0 z-[9999] border-b border-white/10 bg-black/70 backdrop-blur-xl">
+      <header
+        className={`fixed left-0 right-0 top-0 z-[9999] transition-all duration-300 ${
+          isScrolled
+            ? "border-b border-white/10 bg-black/80 py-0 shadow-[0_10px_40px_rgba(0,0,0,0.35)] backdrop-blur-2xl"
+            : "border-b border-white/5 bg-black/35 py-2 backdrop-blur-md"
+        }`}
+      >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <a href="#home" className="text-2xl font-black">
             jlrazor<span className="text-red-500">.</span>
@@ -158,40 +213,86 @@ export default function Portfolio() {
         </div>
       </header>
 
-      <section id="home" className="mx-auto flex min-h-screen max-w-7xl items-center px-6 pt-28">
-        <div className="w-full text-center">
-          <p className="mb-5 text-xs font-bold uppercase tracking-[0.35em] text-red-500">
-            Créatif indépendant
-          </p>
+      <section id="home" className="mx-auto flex min-h-screen max-w-7xl items-center px-6 pt-32">
+        <div className="grid w-full items-center gap-14 lg:grid-cols-2">
+          <div>
+            <p className="mb-5 text-xs font-bold uppercase tracking-[0.35em] text-red-500">
+              Créatif indépendant
+            </p>
 
-          <h1 className="mx-auto max-w-5xl text-5xl font-black leading-tight md:text-7xl">
-            Donner vie à vos <span className="text-red-500">idées</span>.
-          </h1>
+            <h1 className="max-w-5xl text-5xl font-black leading-tight md:text-7xl">
+              Donner vie à vos <span className="text-red-500">idées</span>.
+            </h1>
 
-          <p className="mx-auto mt-8 max-w-2xl text-lg text-white/60">
-            Logos, covers, affiches esport et créations 3D.
-          </p>
+            <p className="mt-8 max-w-2xl text-lg leading-8 text-white/60">
+              Logos, covers, affiches esport et créations 3D.
+            </p>
 
-          <div className="mt-10 flex justify-center gap-4">
-            <a href="#work" className="rounded-2xl bg-red-600 px-8 py-4 font-bold uppercase tracking-wider transition hover:bg-red-500">
-              Voir mes projets
-            </a>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <a href="#work" className="rounded-2xl bg-red-600 px-8 py-4 font-bold uppercase tracking-wider transition hover:bg-red-500">
+                Voir mes projets
+              </a>
 
-            <a href="#contact" className="rounded-2xl border border-white/10 px-8 py-4 font-bold uppercase tracking-wider transition hover:border-red-500">
-              Contact
-            </a>
+              <a href="#contact" className="rounded-2xl border border-white/10 px-8 py-4 font-bold uppercase tracking-wider transition hover:border-red-500">
+                Contact
+              </a>
+            </div>
+
+            <div className="mt-12 grid max-w-md grid-cols-2 gap-4">
+              <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+                <p className="text-4xl font-black text-red-500">
+                  +{projects.length}
+                </p>
+                <p className="mt-2 text-xs uppercase tracking-widest text-white/50">
+                  Projets
+                </p>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+                <p className="text-4xl font-black text-red-500">+15</p>
+                <p className="mt-2 text-xs uppercase tracking-widest text-white/50">
+                  Clients
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="relative mt-24 flex justify-center">
-            <div className="absolute h-[700px] w-[700px] rounded-full bg-red-600/20 blur-3xl" />
-            <Image
-              src="/logo.png"
-              alt="logo"
-              width={700}
-              height={700}
-              className="pointer-events-none relative z-10 object-contain"
-              priority
-            />
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-red-600/20 blur-3xl" />
+
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black p-4 shadow-[0_0_60px_rgba(239,68,68,0.18)]">
+              <Image
+                src={featuredProjects[carouselIndex].image}
+                alt={featuredProjects[carouselIndex].title}
+                width={1200}
+                height={900}
+                className="h-[520px] w-full rounded-[1.5rem] object-cover transition duration-700"
+                priority
+              />
+
+              <div className="absolute inset-x-4 bottom-4 rounded-b-[1.5rem] bg-gradient-to-t from-black via-black/60 to-transparent p-6">
+                <p className="text-2xl font-black">
+                  {featuredProjects[carouselIndex].title}
+                </p>
+                <p className="mt-1 text-xs uppercase tracking-widest text-red-500">
+                  {featuredProjects[carouselIndex].type}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-center gap-2">
+              {featuredProjects.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCarouselIndex(index)}
+                  className={`h-2 rounded-full transition-all ${
+                    carouselIndex === index
+                      ? "w-8 bg-red-600"
+                      : "w-2 bg-white/20"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
